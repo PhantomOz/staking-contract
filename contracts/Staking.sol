@@ -13,6 +13,9 @@ contract Staking {
     mapping(address => uint256) private addressToStakedTime;
     mapping(address => uint256) private addressToReward;
 
+    event StakeSuccessfull(address indexed _staker, uint256 _amount);
+    event UnstakeSuccessfull(address indexed _staker, uint256 _amount);
+
     constructor(address _token) {
         token = IERC20(_token);
     }
@@ -28,6 +31,8 @@ contract Staking {
         addressToReward[msg.sender] += _calculateReward(msg.sender);
         addressToStakedAmount[msg.sender] += _amount;
         addressToStakedTime[msg.sender] = block.timestamp;
+
+        emit StakeSuccessfull(msg.sender, _amount);
     }
 
     function unstake() external {
@@ -45,6 +50,8 @@ contract Staking {
         addressToStakedTime[msg.sender] = 0;
 
         token.transfer(msg.sender, _amount);
+
+        emit UnstakeSuccessfull(msg.sender, _amount);
     }
 
     function _calculateReward(

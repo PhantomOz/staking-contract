@@ -9,6 +9,7 @@ contract Staking {
     IERC20 token;
     mapping(address => uint256) private addressToStakedAmount;
     mapping(address => uint256) private addressToStakedTime;
+    mapping(address => uint256) private addressToReward;
 
     constructor(address _token) {
         token = IERC20(_token);
@@ -26,12 +27,24 @@ contract Staking {
         addressToStakedTime[msg.sender] = block.timestamp;
     }
 
-    function _calculateReward() internal view returns (uint256 _reward) {
-        uint256 _userStake = addressToStakedAmount[msg.sender];
+    function _calculateReward(
+        address _staker
+    ) internal view returns (uint256 _reward) {
+        uint256 _userStake = addressToStakedAmount[_staker];
         uint256 _stakedTimeSeconds = (addressToStakedTime[msg.sender] / 1000);
         uint256 _currentTimeSeconds = (block.timestamp / 1000);
         _reward =
             (_userStake / 10000) *
             (_currentTimeSeconds / _stakedTimeSeconds);
+    }
+
+    function viewReward(
+        address _staker
+    ) external view returns (uint256 _reward) {
+        if (addressToReward[_staker] == 0) {
+            _reward = _calculateReward(_staker);
+        } else {
+            _reward = addressToReward[_staker] + _calculateReward(_staker);
+        }
     }
 }

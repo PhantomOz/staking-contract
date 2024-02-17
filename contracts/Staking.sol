@@ -4,6 +4,8 @@ import "./IERC20.sol";
 
 error AMOUNT_CANT_BE_ZERO();
 error INSUFFICIENT_FUNDS();
+error NO_STAKED_AMOUNT();
+error UNABLE_TO_DISPENSE();
 
 contract Staking {
     IERC20 token;
@@ -25,6 +27,23 @@ contract Staking {
         token.transferFrom(msg.sender, address(this), _amount);
         addressToStakedAmount[msg.sender] += _amount;
         addressToStakedTime[msg.sender] = block.timestamp;
+    }
+
+    function unstake() external {
+        if (addressToStakedAmount[msg.sender] <= 0) {
+            revert NO_STAKED_AMOUNT();
+        }
+        uint256 _amount = addressToReward[msg.sender] +
+            _calculateReward(msg.sender) +
+            addressToStakedAmount[msg.sender];
+        if (token.balanceOf(address(this)) < _amount) {
+            revert UNABLE_TO_DISPENSE();
+        }
+        addressToReward[msg.sender] = 0;
+        addressToStakedAmount[msg.sender] = 0;
+        addressToStakedTime[msg.sender] = 0;
+
+        token.transfer(msg.sender, _amount);
     }
 
     function _calculateReward(

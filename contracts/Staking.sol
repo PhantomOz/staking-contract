@@ -7,6 +7,8 @@ error INSUFFICIENT_FUNDS();
 
 contract Staking {
     IERC20 token;
+    mapping(address => uint256) private addressToStakedAmount;
+    mapping(address => uint256) private addressToStakedTime;
 
     constructor(address _token) {
         token = IERC20(_token);
@@ -20,5 +22,7 @@ contract Staking {
             revert INSUFFICIENT_FUNDS();
         }
         token.transferFrom(msg.sender, address(this), _amount);
+        addressToStakedAmount[msg.sender] += _amount;
+        addressToStakedTime[msg.sender] = block.timestamp;
     }
 }

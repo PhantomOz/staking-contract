@@ -8,7 +8,7 @@ error NO_STAKED_AMOUNT();
 error UNABLE_TO_DISPENSE();
 
 contract Staking {
-    IERC20 token;
+    IERC20 immutable token;
     mapping(address => uint256) private addressToStakedAmount;
     mapping(address => uint256) private addressToStakedTime;
     mapping(address => uint256) private addressToReward;
@@ -25,6 +25,7 @@ contract Staking {
             revert INSUFFICIENT_FUNDS();
         }
         token.transferFrom(msg.sender, address(this), _amount);
+        addressToReward[msg.sender] += _calculateReward(msg.sender);
         addressToStakedAmount[msg.sender] += _amount;
         addressToStakedTime[msg.sender] = block.timestamp;
     }
@@ -60,10 +61,6 @@ contract Staking {
     function viewReward(
         address _staker
     ) external view returns (uint256 _reward) {
-        if (addressToReward[_staker] == 0) {
-            _reward = _calculateReward(_staker);
-        } else {
-            _reward = addressToReward[_staker] + _calculateReward(_staker);
-        }
+        _reward = addressToReward[_staker] + _calculateReward(_staker);
     }
 }

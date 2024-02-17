@@ -25,4 +25,13 @@ contract Staking {
         addressToStakedAmount[msg.sender] += _amount;
         addressToStakedTime[msg.sender] = block.timestamp;
     }
+
+    function _calculateReward() internal view returns (uint256 _reward) {
+        uint256 _userStake = addressToStakedAmount[msg.sender];
+        uint256 _stakedTimeSeconds = (addressToStakedTime[msg.sender] / 1000);
+        uint256 _currentTimeSeconds = (block.timestamp / 1000);
+        _reward =
+            (_userStake / 10000) *
+            (_currentTimeSeconds / _stakedTimeSeconds);
+    }
 }

@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const ERC20 = "";
+  const ERC20 = "0x8D34FDbE29c4c60cd76A585372b52b3632C08F57";
   const staking = await ethers.deployContract("Staking", [ERC20]);
 
   await staking.waitForDeployment();

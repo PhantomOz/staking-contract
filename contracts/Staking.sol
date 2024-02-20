@@ -28,9 +28,13 @@ contract Staking {
             revert INSUFFICIENT_FUNDS();
         }
         token.transferFrom(msg.sender, address(this), _amount);
-        addressToReward[msg.sender] += _calculateReward(msg.sender);
-        addressToStakedAmount[msg.sender] += _amount;
+
+        if (addressToStakedAmount[msg.sender] > 0) {
+            addressToReward[msg.sender] += _calculateReward(msg.sender);
+        }
+
         addressToStakedTime[msg.sender] = block.timestamp;
+        addressToStakedAmount[msg.sender] += _amount;
 
         emit StakeSuccessfull(msg.sender, _amount);
     }

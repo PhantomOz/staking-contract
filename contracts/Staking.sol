@@ -70,4 +70,10 @@ contract Staking {
     ) external view returns (uint256 _reward) {
         _reward = addressToReward[_staker] + _calculateReward(_staker);
     }
+
+    function viewStakes(
+        address _staker
+    ) external view returns (uint256 _stake) {
+        _stake = addressToStakedAmount[_staker];
+    }
 }
